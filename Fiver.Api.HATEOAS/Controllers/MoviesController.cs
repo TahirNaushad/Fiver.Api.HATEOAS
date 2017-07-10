@@ -65,7 +65,9 @@ namespace Fiver.Api.HATEOAS.Controllers
         }
 
         [HttpPost(Name = "CreateMovie")]
-        public IActionResult Create([FromBody]MovieInputModel inputModel)
+        public IActionResult Create(
+            [FromBody]MovieInputModel inputModel,
+            [FromHeader(Name = "Accept")]string acceptHeader)
         {
             if (inputModel == null)
                 return BadRequest();
@@ -76,8 +78,16 @@ namespace Fiver.Api.HATEOAS.Controllers
             var model = ToDomainModel(inputModel);
             service.AddMovie(model);
 
-            var outputModel = ToOutputModel_Default(model);
-            return CreatedAtRoute("GetMovie", new { id = outputModel.Id }, outputModel);
+            if (string.Equals(acceptHeader, "application/vnd.fiver.hateoas+json"))
+            {
+                var outputModel = ToOutputModel_Links(model);
+                return CreatedAtRoute("GetMovie", new { id = outputModel.Value.Id }, outputModel);
+            }
+            else
+            {
+                var outputModel = ToOutputModel_Default(model);
+                return CreatedAtRoute("GetMovie", new { id = outputModel.Id }, outputModel);
+            }
         }
 
         [HttpPut("{id}", Name = "UpdateMovie")]
