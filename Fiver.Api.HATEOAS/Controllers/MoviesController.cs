@@ -27,15 +27,8 @@ namespace Fiver.Api.HATEOAS.Controllers
         public IActionResult Get(PagingParams pagingParams)
         {
             var model = service.GetMovies(pagingParams);
-
-            Response.Headers.Add("X-Pagination", model.GetHeader().ToJson());
-
-            var outputModel = new MovieListOutputModel
-            {
-                Paging = model.GetHeader(),
-                Links = GetLinks(model),
-                Items = model.List.Select(m => ToMovieInfo(m)).ToList(),
-            };
+            
+            var outputModel = ToOutputModel(model);
             return Ok(outputModel);
         }
 
@@ -50,7 +43,7 @@ namespace Fiver.Api.HATEOAS.Controllers
             return Ok(outputModel);
         }
 
-        [HttpPost]
+        [HttpPost(Name = "CreateMovie")]
         public IActionResult Create([FromBody]MovieInputModel inputModel)
         {
             if (inputModel == null)
@@ -66,7 +59,7 @@ namespace Fiver.Api.HATEOAS.Controllers
             return CreatedAtRoute("GetMovie", new { id = outputModel.Id }, outputModel);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}", Name = "UpdateMovie")]
         public IActionResult Update(int id, [FromBody]MovieInputModel inputModel)
         {
             if (inputModel == null || id != inputModel.Id)
@@ -84,7 +77,7 @@ namespace Fiver.Api.HATEOAS.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("{id}", Name = "UpdatePatchMovie")]
         public IActionResult UpdatePatch(
             int id, [FromBody]JsonPatchDocument<MovieInputModel> patch)
         {
@@ -108,7 +101,7 @@ namespace Fiver.Api.HATEOAS.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}", Name = "DeleteMovie")]
         public IActionResult Delete(int id)
         {
             if (!service.MovieExists(id))
@@ -121,54 +114,108 @@ namespace Fiver.Api.HATEOAS.Controllers
 
         #region " Links "
 
-        private List<LinkInfo> GetLinks(PagedList<Movie> list)
+        private List<LinkInfo> GetLinks_List(PagedList<Movie> model)
         {
             var links = new List<LinkInfo>();
 
-            if (list.HasPreviousPage)
-                links.Add(CreateLink("GetMovies", list.PreviousPageNumber, list.PageSize, "previousPage", "GET"));
+            links.Add(new LinkInfo
+            {
+                Href = urlHelper.Link("GetMovies",
+                            new { PageNumber = model.PageNumber, PageSize = model.PageSize }),
+                Rel = "self",
+                Method = "GET"
+            });
 
-            links.Add(CreateLink("GetMovies", list.PageNumber, list.PageSize, "self", "GET"));
+            if (model.HasPreviousPage)
+                links.Add(new LinkInfo
+                {
+                    Href = urlHelper.Link("GetMovies",
+                            new { PageNumber = model.PreviousPageNumber, PageSize = model.PageSize }),
+                    Rel = "previous-page",
+                    Method = "GET"
+                });
 
-            if (list.HasNextPage)
-                links.Add(CreateLink("GetMovies", list.NextPageNumber, list.PageSize, "nextPage", "GET"));
+            if (model.HasNextPage)
+                links.Add(new LinkInfo
+                {
+                    Href = urlHelper.Link("GetMovies",
+                            new { PageNumber = model.NextPageNumber, PageSize = model.PageSize }),
+                    Rel = "next-page",
+                    Method = "GET"
+                });
 
+            links.Add(new LinkInfo
+            {
+                Href = urlHelper.Link("CreateMovie", new { }),
+                Rel = "create-movie",
+                Method = "POST"
+            });
+            
             return links;
         }
-
-        private LinkInfo CreateLink(
-            string routeName, int pageNumber, int pageSize,
-            string rel, string method)
+        
+        private List<LinkInfo> GetLinks_Model(Movie model)
         {
-            return new LinkInfo
+            var links = new List<LinkInfo>();
+
+            links.Add(new LinkInfo
             {
-                Href = urlHelper.Link(routeName,
-                            new { PageNumber = pageNumber, PageSize = pageSize }),
-                Rel = rel,
-                Method = method
-            };
+                Href = urlHelper.Link("GetMovie", new { id = model.Id }),
+                Rel = "self",
+                Method = "GET"
+            });
+
+            links.Add(new LinkInfo
+            {
+                Href = urlHelper.Link("UpdateMovie", new { id = model.Id }),
+                Rel = "update-movie",
+                Method = "PUT"
+            });
+
+            links.Add(new LinkInfo
+            {
+                Href = urlHelper.Link("UpdatePatchMovie", new { id = model.Id }),
+                Rel = "update-partial-movie",
+                Method = "PATCH"
+            });
+
+            links.Add(new LinkInfo
+            {
+                Href = urlHelper.Link("DeleteMovie", new { id = model.Id }),
+                Rel = "delete-movie",
+                Method = "DELETE"
+            });
+
+            return links;
         }
 
         #endregion
 
         #region " Mappings "
 
-        private MovieInfo ToMovieInfo(Movie model)
+        private MovieListOutputModel ToOutputModel(PagedList<Movie> model)
         {
-            return new MovieInfo
+            return new MovieListOutputModel
             {
-                Id = model.Id,
-                Title = model.Title,
-                ReleaseYear = model.ReleaseYear,
-                Summary = model.Summary,
-                LastReadAt = DateTime.Now
+                Paging = model.GetHeader(),
+                Links = GetLinks_List(model),
+                Items = model.List.Select(m => new MovieInfo
+                {
+                    Links = GetLinks_Model(m),
+                    Id = m.Id,
+                    Title = m.Title,
+                    ReleaseYear = m.ReleaseYear,
+                    Summary = m.Summary,
+                    LastReadAt = DateTime.Now
+                }).ToList(),
             };
         }
-
+        
         private MovieOutputModel ToOutputModel(Movie model)
         {
             return new MovieOutputModel
             {
+                Links = GetLinks_Model(model),
                 Id = model.Id,
                 Title = model.Title,
                 ReleaseYear = model.ReleaseYear,

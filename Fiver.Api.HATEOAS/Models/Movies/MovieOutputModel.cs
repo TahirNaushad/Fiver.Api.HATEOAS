@@ -13,6 +13,7 @@ namespace Fiver.Api.HATEOAS.Models.Movies
 
     public class MovieInfo
     {
+        public List<LinkInfo> Links { get; set; }
         public int Id { get; set; }
         public string Title { get; set; }
         public int ReleaseYear { get; set; }
@@ -22,6 +23,7 @@ namespace Fiver.Api.HATEOAS.Models.Movies
 
     public class MovieOutputModel
     {
+        public List<LinkInfo> Links { get; set; }
         public int Id { get; set; }
         public string Title { get; set; }
         public int ReleaseYear { get; set; }
