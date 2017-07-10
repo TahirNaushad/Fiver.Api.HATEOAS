@@ -5,8 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Movies\Models\" />
-    <Folder Include="Movies\Models\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
   <ItemGroup>
