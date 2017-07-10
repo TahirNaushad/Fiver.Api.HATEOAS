@@ -24,23 +24,44 @@ namespace Fiver.Api.HATEOAS.Controllers
         }
 
         [HttpGet(Name = "GetMovies")]
-        public IActionResult Get(PagingParams pagingParams)
+        public IActionResult Get(
+            PagingParams pagingParams,
+            [FromHeader(Name = "Accept")]string acceptHeader)
         {
             var model = service.GetMovies(pagingParams);
-            
-            var outputModel = ToOutputModel(model);
-            return Ok(outputModel);
+
+            Response.Headers.Add("X-Pagination", model.GetHeader().ToJson());
+
+            if (string.Equals(acceptHeader, "application/vnd.fiver.hateoas+json"))
+            {
+                var outputModel = ToOutputModel_Links(model);
+                return Ok(outputModel);
+            }
+            else
+            {
+                var outputModel = ToOutputModel_Default(model);
+                return Ok(outputModel);
+            }
         }
 
         [HttpGet("{id}", Name = "GetMovie")]
-        public IActionResult Get(int id)
+        public IActionResult Get(int id,
+            [FromHeader(Name = "Accept")]string acceptHeader)
         {
             var model = service.GetMovie(id);
             if (model == null)
                 return NotFound();
 
-            var outputModel = ToOutputModel(model);
-            return Ok(outputModel);
+            if (string.Equals(acceptHeader, "application/vnd.fiver.hateoas+json"))
+            {
+                var outputModel = ToOutputModel_Links(model);
+                return Ok(outputModel);
+            }
+            else
+            {
+                var outputModel = ToOutputModel_Default(model);
+                return Ok(outputModel);
+            }
         }
 
         [HttpPost(Name = "CreateMovie")]
@@ -55,7 +76,7 @@ namespace Fiver.Api.HATEOAS.Controllers
             var model = ToDomainModel(inputModel);
             service.AddMovie(model);
 
-            var outputModel = ToOutputModel(model);
+            var outputModel = ToOutputModel_Default(model);
             return CreatedAtRoute("GetMovie", new { id = outputModel.Id }, outputModel);
         }
 
@@ -150,10 +171,10 @@ namespace Fiver.Api.HATEOAS.Controllers
                 Rel = "create-movie",
                 Method = "POST"
             });
-            
+
             return links;
         }
-        
+
         private List<LinkInfo> GetLinks_Model(Movie model)
         {
             var links = new List<LinkInfo>();
@@ -193,29 +214,25 @@ namespace Fiver.Api.HATEOAS.Controllers
 
         #region " Mappings "
 
-        private MovieListOutputModel ToOutputModel(PagedList<Movie> model)
+        private List<MovieOutputModel> ToOutputModel_Default(PagedList<Movie> model)
         {
-            return new MovieListOutputModel
+            return model.List.Select(m => ToOutputModel_Default(m)).ToList();
+        }
+
+        private LinksWrapperList<MovieOutputModel>
+            ToOutputModel_Links(PagedList<Movie> model)
+        {
+            return new LinksWrapperList<MovieOutputModel>
             {
-                Paging = model.GetHeader(),
-                Links = GetLinks_List(model),
-                Items = model.List.Select(m => new MovieInfo
-                {
-                    Links = GetLinks_Model(m),
-                    Id = m.Id,
-                    Title = m.Title,
-                    ReleaseYear = m.ReleaseYear,
-                    Summary = m.Summary,
-                    LastReadAt = DateTime.Now
-                }).ToList(),
+                Values = model.List.Select(m => ToOutputModel_Links(m)).ToList(),
+                Links = GetLinks_List(model)
             };
         }
-        
-        private MovieOutputModel ToOutputModel(Movie model)
+
+        private MovieOutputModel ToOutputModel_Default(Movie model)
         {
             return new MovieOutputModel
             {
-                Links = GetLinks_Model(model),
                 Id = model.Id,
                 Title = model.Title,
                 ReleaseYear = model.ReleaseYear,
@@ -223,7 +240,23 @@ namespace Fiver.Api.HATEOAS.Controllers
                 LastReadAt = DateTime.Now
             };
         }
-        
+
+        private LinksWrapper<MovieOutputModel> ToOutputModel_Links(Movie model)
+        {
+            return new LinksWrapper<MovieOutputModel>
+            {
+                Value = new MovieOutputModel
+                {
+                    Id = model.Id,
+                    Title = model.Title,
+                    ReleaseYear = model.ReleaseYear,
+                    Summary = model.Summary,
+                    LastReadAt = DateTime.Now
+                },
+                Links = GetLinks_Model(model)
+            };
+        }
+
         private Movie ToDomainModel(MovieInputModel inputModel)
         {
             return new Movie
@@ -245,7 +278,7 @@ namespace Fiver.Api.HATEOAS.Controllers
                 Summary = model.Summary
             };
         }
-        
+
         #endregion
     }
 }

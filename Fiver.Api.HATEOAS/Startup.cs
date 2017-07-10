@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace Fiver.Api.HATEOAS
 {
@@ -31,12 +32,19 @@ namespace Fiver.Api.HATEOAS
 
             services.AddSingleton<IMovieService, MovieService>();
 
-            services.AddMvc()
-                    .AddJsonOptions(options =>
-                    {
-                        options.SerializerSettings.ContractResolver =
-                            new CamelCasePropertyNamesContractResolver();
-                    });
+            services.AddMvc(options =>
+            {
+                options.ReturnHttpNotAcceptable = true;
+                options.OutputFormatters
+                       .OfType<JsonOutputFormatter>()
+                       .FirstOrDefault()
+                       ?.SupportedMediaTypes.Add("application/vnd.fiver.hateoas+json");
+            })
+            .AddJsonOptions(options =>
+            {
+                options.SerializerSettings.ContractResolver =
+                    new CamelCasePropertyNamesContractResolver();
+            });
         }
 
         public void Configure(
