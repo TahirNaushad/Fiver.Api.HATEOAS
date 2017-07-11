@@ -35,6 +35,12 @@ namespace Fiver.Api.HATEOAS
             services.AddMvc(options =>
             {
                 options.ReturnHttpNotAcceptable = true;
+
+                options.InputFormatters
+                       .OfType<JsonInputFormatter>()
+                       .FirstOrDefault()
+                       ?.SupportedMediaTypes.Add("application/vnd.fiver.movie.input+json");
+
                 options.OutputFormatters
                        .OfType<JsonOutputFormatter>()
                        .FirstOrDefault()

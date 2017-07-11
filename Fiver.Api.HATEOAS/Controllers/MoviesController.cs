@@ -64,6 +64,7 @@ namespace Fiver.Api.HATEOAS.Controllers
             }
         }
 
+        [ContentTypeOf("application/vnd.fiver.movie.input+json")]
         [HttpPost(Name = "CreateMovie")]
         public IActionResult Create(
             [FromBody]MovieInputModel inputModel,
