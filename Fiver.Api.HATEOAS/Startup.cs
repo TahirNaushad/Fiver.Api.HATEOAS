@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Fiver.Api.HATEOAS.OtherLayers;
 using Newtonsoft.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
@@ -55,8 +51,7 @@ namespace Fiver.Api.HATEOAS
 
         public void Configure(
             IApplicationBuilder app,
-            IHostingEnvironment env,
-            ILoggerFactory loggerFactory)
+            IHostingEnvironment env)
         {
             app.UseExceptionHandler(configure =>
             {

@@ -1,9 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.12
+VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fiver.Api.HATEOAS", "Fiver.Api.HATEOAS\Fiver.Api.HATEOAS.csproj", "{EE4D9AEF-72A3-437A-B1C5-8C8E02009666}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fiver.Api.HATEOAS", "Fiver.Api.HATEOAS\Fiver.Api.HATEOAS.csproj", "{EE4D9AEF-72A3-437A-B1C5-8C8E02009666}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "postman", "postman", "{B66E61DC-DE6F-48DF-8EE4-B103910D2308}"
+	ProjectSection(SolutionItems) = preProject
+		postman\API - HATEOAS.postman_collection.json = postman\API - HATEOAS.postman_collection.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +23,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2A927FF0-08E4-4C2A-98AF-0E81ABDE0611}
 	EndGlobalSection
 EndGlobal

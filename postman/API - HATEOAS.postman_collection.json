@@ -1,0 +1,121 @@
+{
+	"variables": [],
+	"info": {
+		"name": "API - HATEOAS",
+		"_postman_id": "f86ff908-3955-b7f2-a326-16b20c90cc87",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:23991/movies",
+			"request": {
+				"url": "http://localhost:23991/movies",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.fiver.hateoas+json",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:23991/movies/21",
+			"request": {
+				"url": "http://localhost:23991/movies/20",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.fiver.hateoas+json",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:23991/movies",
+			"request": {
+				"url": "http://localhost:23991/movies",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/vnd.fiver.movie.input+json",
+						"description": ""
+					},
+					{
+						"key": "Accept",
+						"value": "application/vnd.fiver.hateoas+json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 21,\n    \"title\": \"Spectre\",\n    \"releaseYear\": 2015,\n    \"summary\": \"A cryptic message from Bond's past sends him on a trail to uncover a sinister organization. While M battles political forces to keep the secret service alive, Bond peels back the layers of deceit to reveal the terrible truth behind SPECTRE.\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:23991/movies/21",
+			"request": {
+				"url": "http://localhost:23991/movies/21",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 21,\n    \"title\": \"Spectre-PUT\",\n    \"releaseYear\": 2015,\n    \"summary\": \"A cryptic message from Bond's past sends him on a trail to uncover a sinister organization. While M battles political forces to keep the secret service alive, Bond peels back the layers of deceit to reveal the terrible truth behind SPECTRE.\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:23991/movies/21",
+			"request": {
+				"url": "http://localhost:23991/movies/21",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:23991/movies/21",
+			"request": {
+				"url": "http://localhost:23991/movies/21",
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json-patch+json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[{\n\t\"op\": \"add\",\n\t\"path\": \"/title\",\n\t\"value\": \"Spectre-Patched\"\n}]"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
